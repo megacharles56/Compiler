@@ -35,6 +35,26 @@ public class Scanner {
         palabrasReservadas.put("mientras", TipoToken.MIENTRAS);
     }
 
+    private static final Map<Character, TipoToken> signosSistema;
+    static {
+        signosSistema = new HashMap<>();
+        signosSistema.put('(', TipoToken.PARENTESIS_IZQ);
+        signosSistema.put(')', TipoToken.PARENTESIS_DER);
+        signosSistema.put('{', TipoToken.CORCHETE_IZQ);
+        signosSistema.put('}', TipoToken.CORCHETE_DER);
+        signosSistema.put(',', TipoToken.COMA);
+        signosSistema.put('.', TipoToken.PUNTO);
+        signosSistema.put(';', TipoToken.PUNTO_Y_COMA);
+        signosSistema.put('-', TipoToken.MENOS);
+        signosSistema.put('+', TipoToken.MAS);
+        signosSistema.put('*', TipoToken.ASTERISCO);
+        signosSistema.put('/', TipoToken.DIAGONAL);
+        signosSistema.put('!', TipoToken.EXCLAMACION);
+        signosSistema.put('=', TipoToken.IGUAL);
+        signosSistema.put('<', TipoToken.MENOR);
+        signosSistema.put('>', TipoToken.MAYOR);
+    }
+
     Scanner(String source){
         this.source = source;
     }
@@ -43,21 +63,25 @@ public class Scanner {
         
         String lexema="";
         for(int i=0; i<source.length(); i++){
-            if(source.charAt(i) == ' '){
-                if(lexema.isEmpty()){
+            char curr = source.charAt(i);
+            if(curr == '.' || isDigit(curr) || isLetter(curr)){
+                lexema+=source.charAt(i);
+                
+            }else{
+                if(signosSistema.contains(curr)){
+                    tokens.add(new Token(signosSistema.get(curr), String.valueOf(curr), curr, linea));
+                    
+                }else if(lexema.isEmpty()){
                     continue;
                 }else{
                     if(isIdentifier(lexema))
                         tokens.add(new Token(palabrasReservadas.get(lexema) , lexema, null, linea));
                     else if(isNumber(lexema)){
-
+                        tokens.add(new Token(TipoToken.NUMERO , lexema, null, linea));
                     }
                 }
                 lexema = "";
             }
-            if(source.charAt(i) >= 'a' && source.charAt(i) <= 'z')
-
-            lexema+=source.charAt(i);
 
         }
 
@@ -66,7 +90,7 @@ public class Scanner {
         y al final agregar el token de fin de archivo
          */
         tokens.add(new Token(TipoToken.EOF, "", null, linea));
-
+        linea++;
         return tokens;
     }
 
