@@ -62,17 +62,24 @@ public class Scanner {
         for(int i=0; i<source.length(); i++){
             curr = source.charAt(i);
             if(curr == '.' || isDigit(curr) || isLetter(curr)){
-                lexema+=source.charAt(i);
+                lexema+=curr;
             }else{
                 if(lexema.isEmpty()){
-                    System.out.println(curr + " vacio");
                     if(signosSistema.containsKey(curr)){
-                        System.out.println("caracter");
                         tokens.add(new Token(signosSistema.get(curr), String.valueOf(curr), curr, linea));
+                    }
+                    if(curr == '\"'){
+                        curr = source.charAt(i);
+                        while(curr != '\"'){
+                            curr = source.charAt(i);
+                            lexema+=curr;
+                            i++;
+                        }
+                        tokens.add(new Token(TipoToken.CADENA, lexema, lexema, linea));
+                        lexema="";
                     }
                     continue;
                 }else{
-                    System.out.println(lexema + " cadena");
                     if(isNumber(lexema)){
                         tokens.add(new Token(TipoToken.NUMERO , lexema, null, linea));
                     }else if(isLexema(lexema)){
@@ -84,7 +91,18 @@ public class Scanner {
                     }
                     i--;
                 }
-                lexema = "";
+                lexema="";
+            }
+        }
+        if(!lexema.isEmpty()){
+            if(isNumber(lexema)){
+                tokens.add(new Token(TipoToken.NUMERO , lexema, null, linea));
+            }else if(isLexema(lexema)){
+                if(palabrasReservadas.containsKey(lexema)){
+                    tokens.add(new Token(palabrasReservadas.get(lexema) , lexema, lexema, linea));
+                }else{
+                    tokens.add(new Token(TipoToken.ID, lexema, lexema, linea));
+                }
             }
         }
         /*
