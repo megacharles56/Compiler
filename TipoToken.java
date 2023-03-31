@@ -1,4 +1,3 @@
-package mx.ipn.escom.compiladores;
 
 public enum TipoToken {
     // Crear un tipoToken por palabra reservada

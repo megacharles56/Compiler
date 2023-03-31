@@ -1,6 +1,3 @@
-
-package mx.ipn.escom.compiladores;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,31 +57,36 @@ public class Scanner {
     }
 
     List<Token> scanTokens(){
-        
+        char curr;
         String lexema="";
         for(int i=0; i<source.length(); i++){
-            char curr = source.charAt(i);
+            curr = source.charAt(i);
             if(curr == '.' || isDigit(curr) || isLetter(curr)){
                 lexema+=source.charAt(i);
-                
             }else{
-                if(signosSistema.contains(curr)){
-                    tokens.add(new Token(signosSistema.get(curr), String.valueOf(curr), curr, linea));
-                    
-                }else if(lexema.isEmpty()){
+                if(lexema.isEmpty()){
+                    System.out.println(curr + " vacio");
+                    if(signosSistema.containsKey(curr)){
+                        System.out.println("caracter");
+                        tokens.add(new Token(signosSistema.get(curr), String.valueOf(curr), curr, linea));
+                    }
                     continue;
                 }else{
-                    if(isIdentifier(lexema))
-                        tokens.add(new Token(palabrasReservadas.get(lexema) , lexema, null, linea));
-                    else if(isNumber(lexema)){
+                    System.out.println(lexema + " cadena");
+                    if(isNumber(lexema)){
                         tokens.add(new Token(TipoToken.NUMERO , lexema, null, linea));
+                    }else if(isLexema(lexema)){
+                        if(palabrasReservadas.containsKey(lexema)){
+                            tokens.add(new Token(palabrasReservadas.get(lexema) , lexema, lexema, linea));
+                        }else{
+                            tokens.add(new Token(TipoToken.ID, lexema, lexema, linea));
+                        }
                     }
+                    i--;
                 }
                 lexema = "";
             }
-
         }
-
         /*
         Analizar el texto de entrada para extraer todos los tokens
         y al final agregar el token de fin de archivo
@@ -93,29 +95,99 @@ public class Scanner {
         linea++;
         return tokens;
     }
-
-    boolean isIdentifier(String lexema){
-        boolean[] q ={false, false, true};
+    
+    boolean isLexema(String lexema){
+        boolean[] q ={false, true, false};
         int state=0;
-        for(int i=0; i<source.length(); i++){
-            if(state==0){
-                if(true);
-            }else if(state==1){
-
+        char curr;
+        for(int i=0; i<lexema.length(); i++){
+            curr = lexema.charAt(i);
+            switch(state){
+                case 0:{
+                    if(isLetter(curr)){
+                        state=1;
+                    }else{
+                        state=2;
+                    }
+                    break;
+                }
+                case 1:{
+                    if(isLetter(curr) || isDigit(curr)){
+                        state=1;
+                    }else{
+                        state=2;
+                    }
+                    break;
+                }
+                case 2:{
+                    break;
+                }
             }
         }
         return q[state];
     }
 
     boolean isNumber(String lexema){
-        boolean[] q ={true, false, true, false, true, false, false, true};
+        boolean[] q ={false, true, false, true, false, false, false, true};
         int state=0;
-        for(int i=0; i<source.length(); i++){
-            if(state==0){
-
-            }else if(state==1){
-
+        char curr;
+        for(int i=0; i<lexema.length(); i++){
+            curr = lexema.charAt(i);
+            switch(state){
+                case 0:{//false 
+                    if(isDigit(curr))
+                        state=1;
+                    else
+                        state=4;
+                    break;
+                }
+                case 1:{//true 1
+                    if(curr == '.')
+                        state=2;
+                    else if(curr == 'E')
+                        state=5;
+                    break;
+                }
+                case 2:{//false 1.
+                    if(isDigit(curr))
+                        state=3;
+                    else
+                        state=4;
+                    break;
+                }
+                case 3:{//true 1.1
+                    if(curr == 'E')
+                        state=5;
+                    else
+                        state=4;
+                    break;
+                }
+                case 4:{//false
+                    break;
+                }
+                case 5:{//false 1.1E or 1E
+                    if(curr == '+' || curr == '-'){
+                        state=6;
+                    }else
+                        state=4;
+                    break;
+                }
+                case 6:{//false 1.1E+ or 1E+
+                    if(isDigit(curr))
+                        state=7;
+                    else
+                        state=4;
+                    break;
+                }
+                case 7:{//true 1.1E+1 or 1E+1
+                    if(isDigit(curr))
+                        state=7;
+                    else
+                        state=4;
+                    break;
+                }
             }
+
         }
         return q[state];
     }
