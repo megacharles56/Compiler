@@ -227,7 +227,7 @@ public class Scanner {
                     break;
                 case 8:
                     if(caracter == '='){
-                        System.out.println("Hola " + lexema);
+                        //System.out.println("Hola " + lexema);
                         if(lexema.equals("=")){
                             tokens.add(new Token(TipoToken.COMPARACION, "==", "==", linea));
                         }else if(lexema.equals("<")){

@@ -79,15 +79,19 @@ public class Parser {
 
         if(preanalisis.equals(clase)){
             CLASS_DECL();
+            DECLARATION();
         }else if(preanalisis.equals(fun)){
             FUN_DECL();
+            DECLARATION();
         }else if(preanalisis.equals(var)){
             VAR_DECL();
+            DECLARATION();
         }else if(preanalisis.equals(exclamacion) || preanalisis.equals(menos) || preanalisis.equals(falso) || preanalisis.equals(verdadero)
                 || preanalisis.equals(nulo) || preanalisis.equals(este) || preanalisis.equals(numero) || preanalisis.equals(cadena)
                 || preanalisis.equals(identificador) || preanalisis.equals(parentesisIzq) || preanalisis.equals(supert)
                 || preanalisis.equals(para) || preanalisis.equals(si) || preanalisis.equals(imprimir) || preanalisis.equals(retornar) || preanalisis.equals(mientras) || preanalisis.equals(corcheteIzq)){
             STATEMENT();
+            DECLARATION();
         }
     }
     
@@ -331,6 +335,8 @@ public class Parser {
 
         if(preanalisis.equals(corcheteIzq)){
             coincidir(corcheteIzq);
+            System.out.println(hayErrores);
+            System.out.println(preanalisis);
             BLOCK_DECL();
             coincidir(corcheteDer);
         }else{
