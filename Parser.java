@@ -335,8 +335,6 @@ public class Parser {
 
         if(preanalisis.equals(corcheteIzq)){
             coincidir(corcheteIzq);
-            System.out.println(hayErrores);
-            System.out.println(preanalisis);
             BLOCK_DECL();
             coincidir(corcheteDer);
         }else{
